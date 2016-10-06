@@ -10,13 +10,18 @@ import com.vaadin.util.ReflectTools;
 @SuppressWarnings("serial")
 public class EditForm extends FormLayout {
 	
+	
+	private void testFireEvent() {
+		fireEvent(new FriendEvent(this, "marko", FriendActions.CREATE));
+	}
+	
 	/*
 	 * DELETE ME
 	 */
 	FriendListener listener = new FriendListener() {
 		
 		@Override
-		public void editFriend(FriendEvent event) {
+		public void handleFriend(FriendEvent event) {
 			switch (event.getAction()) {
 			case CREATE:
 				
@@ -57,10 +62,10 @@ public class EditForm extends FormLayout {
 	}
 
 	public interface FriendListener extends Serializable {
-		public static final Method METHOD = ReflectTools.findMethod(FriendListener.class, "editFriend",
+		public static final Method METHOD = ReflectTools.findMethod(FriendListener.class, "handleFriend",
 				FriendEvent.class);
 
-		public void editFriend(FriendEvent event);
+		public void handleFriend(FriendEvent event);
 	}
 
 	public void addFriendListener(FriendListener listener) {
