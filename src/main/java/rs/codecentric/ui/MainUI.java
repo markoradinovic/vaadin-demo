@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
@@ -15,7 +17,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -24,14 +26,14 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SpringUI(path = "main")
+import rs.codecentric.ui.mvp.MvpPresenter;
+
+@SpringUI(path = "")
 @Theme("valo")
 @SuppressWarnings("serial")
 public class MainUI extends UI {
 
 	private ValoMenuLayout root = new ValoMenuLayout();
-
-	private ComponentContainer viewDisplay = root.getContentContainer();
 
 	private CssLayout menu = new CssLayout();
 
@@ -41,25 +43,49 @@ public class MainUI extends UI {
 
 	@Autowired
 	private SpringViewProvider viewProvider;
+	
+	/*
+	 * Handle View changing
+	 */
+	public static class MvpViewDisplay implements ViewDisplay {
+
+		private final CssLayout root;
+		
+		public MvpViewDisplay(CssLayout root) {
+			this.root = root;
+		}
+		
+		@SuppressWarnings({"rawtypes" })
+		@Override
+		public void showView(View view) {
+			root.removeAllComponents();
+			if (view instanceof MvpPresenter) {
+				root.addComponent((Component) ((MvpPresenter) view).getView());
+			}
+		}
+		
+	}
 
 	@Override
 	protected void init(VaadinRequest request) {
+		
 		Responsive.makeResponsive(this);
 		this.getPage().setTitle("Valo Theme Test");
 		this.setContent(root);
 		root.setWidth("100%");
 
-		navigator = new Navigator(this, viewDisplay);
+		MvpViewDisplay mvpViewDisplay = new MvpViewDisplay(root.getContentContainer());
+		navigator = new Navigator(this, mvpViewDisplay);
 		navigator.addProvider(viewProvider);
 
 		root.addMenu(menu);
 		menuItemsLayout.setPrimaryStyleName("valo-menuitems");
 		buildSidebarMenu();
 
-		boolean loggedIn = UI.getCurrent().getSession().getAttribute("IS_LOGGED_IN") != null ? true : false;
-		if (!loggedIn) {
-			getPage().setLocation("/login");
-		}
+//		boolean loggedIn = UI.getCurrent().getSession().getAttribute("IS_LOGGED_IN") != null ? true : false;
+//		if (!loggedIn) {
+//			getPage().setLocation("/login");
+//		}
 		navigator.navigateTo("home");
 	}
 

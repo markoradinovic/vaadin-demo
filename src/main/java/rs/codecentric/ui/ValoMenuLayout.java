@@ -1,7 +1,6 @@
 package rs.codecentric.ui;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -26,7 +25,7 @@ public class ValoMenuLayout extends HorizontalLayout {
         setExpandRatio(contentArea, 1);
     }
 
-    public ComponentContainer getContentContainer() {
+    public CssLayout getContentContainer() {
         return contentArea;
     }
 
